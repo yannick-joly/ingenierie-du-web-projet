@@ -20,10 +20,17 @@ class Router extends AbstractComponent
         $this->file = '';
     }
 
-    public function map(string $url, string $controller, string $action = 'index',
-                        string $method = 'GET', array $additional = [], array $optional = [])
-    {
-        $this->routes[] = new Route($url, $controller, $action, $method, $additional, $optional);
+    public function map(
+        string $url,
+        string $controller,
+        string $action = 'index',
+        string $method = 'GET',
+        array $additional = [],
+        array $optional = []
+    ): Route {
+        $route = new Route($url, $controller, $action, $method, $additional, $optional);
+        $this->routes[] = $route;
+        return $route;
     }
 
     /**
@@ -159,7 +166,7 @@ class Router extends AbstractComponent
     /**
      * Returns a controller based on its name
      * @param string $controllerName controller name
-     * @return object                 controller
+     * @return AbstractController controller
      */
     public function getController(string $controllerName): AbstractController
     {
