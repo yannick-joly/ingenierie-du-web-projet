@@ -45,6 +45,7 @@ class Router extends AbstractComponent
             $parameters = $this->matchRoute($url, $route);
             if (!is_null($parameters)) {
                 $result = $route;
+                break;
             }
         }
 
