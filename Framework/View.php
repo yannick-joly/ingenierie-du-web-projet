@@ -64,7 +64,7 @@ class View extends AbstractComponent
      */
     public function buildRoute(string $routeFormat, ...$args): string
     {
-        return $this->baseUrl . sprintf(...func_get_args());
+        return $this->baseUrl . ltrim(sprintf(...func_get_args()), '/');
     }
 
     /**
