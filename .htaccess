@@ -1,4 +1,7 @@
 <IfModule mod_rewrite.c>
+# will tell the App that mod_rewrite is enabled and .htacces was taken into account
+SetEnv HTTP_MOD_REWRITE On
+
 # activate URL Rewriting
 RewriteEngine On
 
