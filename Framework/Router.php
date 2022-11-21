@@ -39,8 +39,7 @@ class Router extends AbstractComponent
      */
     public function findRoute(?string $url = null): ?Route
     {
-        $foundRoute = false;
-        $result = null;
+        $foundRoute = null;
         $parameters = [];
 
         if (is_null($url)) {
@@ -51,8 +50,8 @@ class Router extends AbstractComponent
         foreach ($this->routes as $route) {
             $parameters = $this->matchRoute($url, $route);
             if (!is_null($parameters)) {
-                $result = $route;
-                break;
+                $foundRoute = $route;
+                $foundRoute->requestParams = $parameters;
             }
         }
 
@@ -60,29 +59,27 @@ class Router extends AbstractComponent
         $get = $_GET;
         unset($get[$this->routeParamName]);
         if (empty($get) === false) {
-            $parameters['get'] = [];
+            $foundRoute->requestParams['get'] = [];
             foreach ($_GET as $key => $getParam) {
                 if ($key != $this->routeParamName) {
-                    $parameters['get'][$key] = $getParam;
+                    $foundRoute->requestParams['get'][$key] = $getParam;
                 }
             }
         }
 
-        if (!is_null($result)) {
-            $result->requestParams = $parameters;
-        }
-
         //return found route and parameters
-        return $result;
+        return $foundRoute;
     }
 
     public function getUrl(): string
     {
+        // base URL as interpreted by this router
+        // (must always start with a "/")
+        $url = "/";
+
         //remove '/' at the end of the url
         if (isset($_GET[$this->routeParamName])) {
-            $url = rtrim($_GET[$this->routeParamName], "/");
-        } else {
-            $url = "/";
+            $url .= trim($_GET[$this->routeParamName], "/");
         }
 
         return $url;
