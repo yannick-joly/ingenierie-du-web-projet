@@ -87,7 +87,6 @@ class Router extends AbstractComponent
 
     public function matchRoute(string $url, Route $route): ?array
     {
-        $routeIsAMatch = false;
         $requiredParams = [];
 
         //handle parameter types
@@ -109,55 +108,57 @@ class Router extends AbstractComponent
             str_replace('.', '\.', $route->url)
         );
 
-        //match route including required parameters
-        if (preg_match('%^' . $regexp . '(/.*)?$%i', $url, $matches)) {
-            $routeIsAMatch = true;
-            $parameters = [];
-            $optional = '';
+        //route doesn't match when including required parameters
+        if (preg_match('%^' . $regexp . '(/.*)?$%i', $url, $matches) == false) {
+            return null;
+        }
 
-            //remove unnecessary match
-            unset($matches[0]);
-            //pop optional parameters if they exists
-            if (count($matches) > count($requiredParams)) {
-                $optional = array_pop($matches);
+        $parameters = [];
+        $optionalParamsGiven = '';
+        
+        //remove unnecessary match
+        unset($matches[0]);
+        //pop optional parameters if they exists
+        if (count($matches) > count($requiredParams)) {
+            $optionalParamsGiven = array_pop($matches);
+        }
+        //combine required parameter values and names
+        if (!empty($requiredParams)) {
+            $parameters = array_combine($requiredParams, $matches);
+        }
+
+        //handle additional parameters (constants given via the route definition)
+        $parameters = array_merge($parameters, $route->additionalParams);
+
+        //handle optional parameters
+        if (!empty($optionalParamsGiven)) {
+            //if there's no "/" between required & optional part
+            if ($optionalParamsGiven[0] !== "/") {
+                return null;
             }
-            //combine required parameter values and names
-            if (!empty($requiredParams)) {
-                $parameters = array_combine($requiredParams, $matches);
+
+            $optionalParamsGiven = preg_split('%\|%', trim($optionalParamsGiven, '/?'));
+            if (count($optionalParamsGiven) == 1 && empty($optionalParamsGiven[0])) {
+                unset($optionalParamsGiven[0]);
+            }
+            $nbOptParam = count($route->optionalParams);
+
+            //route don't really match (maybe has a longer path than the model)
+            if (count($optionalParamsGiven) > $nbOptParam) {
+                return null;
             }
 
-            //handle additional parameters (constants given via the route definition)
-            foreach ($route->additional as $param) {
-                $parameters[$param->getAttribute('name')] = $param->getAttribute('value');
-            }
-
-            //handle optional parameters
-            if (!empty($optional)) {
-                //if there's a "/" between required & optional part
-                if ($optional[0] == "/") {
-                    $optional = preg_split('%\|%', trim($optional, '/?'));
-                    if (count($optional) == 1 && empty($optional[0])) {
-                        unset($optional[0]);
-                    }
-                    $nbOptParam = $route->optional->length;
-
-                    if (count($optional) <= $nbOptParam) {
-                        //match the remaining ones to optional parameters
-                        for ($i = 0; $i < $nbOptParam; $i++) {
-                            if (isset($optional[$i])) {
-                                $parameters[$route->optional->item($i)->getAttribute('name')] = $optional[$i];
-                            }
-                        }
-                    } else {
-                        //route don't really match (maybe has a longer path than the)
-                        $routeIsAMatch = false;
-                    }
-                } else {
-                    $routeIsAMatch = false;
+            //match the remaining ones to optional parameters
+            $i = 0;
+            foreach ($route->optionalParams as $name => $value) {
+                if (isset($optionalParamsGiven[$i])) {
+                    $parameters[$name] = $optionalParamsGiven[$i];
                 }
+                $i++;
             }
         }
-        return $routeIsAMatch ? $parameters : null;
+
+        return $parameters;
     }
 
     /**
