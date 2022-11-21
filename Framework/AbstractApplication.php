@@ -18,7 +18,7 @@ abstract class AbstractApplication
     public function __construct()
     {
         $this->routeParamName = 'url';
-        $this->initView();
+        $this->initView($this->isApacheURLRewritingEnabled());
     }
 
     /**
@@ -87,5 +87,10 @@ abstract class AbstractApplication
      */
     public function rootPath() {
         return dirname(__FILE__);
+    }
+
+    public function isApacheURLRewritingEnabled(): bool
+    {
+        return isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On';
     }
 }

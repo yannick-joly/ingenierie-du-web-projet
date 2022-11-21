@@ -8,14 +8,6 @@ use CPE\Framework\Router;
 
 class Application extends AbstractApplication
 {
-    public function __construct()
-    {
-        parent::__construct();
-
-
-        $this->initView(false);
-    }
-
     public function run()
     {
         // default response if no route found
