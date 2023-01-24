@@ -8,7 +8,8 @@ class DefaultController extends AbstractController
 {
     public function executeIndex()
     {
-        $this->app->view()->setParam('pageTitle', "Bonjour le monde !");
+        $data = "Bonjour le monde !";
+        $this->app->view()->setParam('pageTitle', $data);
         $this->app->view()->render('homepage.tpl.php');
     }
 
