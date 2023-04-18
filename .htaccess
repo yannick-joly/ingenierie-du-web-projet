@@ -7,6 +7,7 @@ RewriteEngine On
 
 # redirect access for application & framework files to frontend
 RewriteRule ^App/           index.php [QSA,L]
+RewriteRule ^Data/          index.php [QSA,L]
 RewriteRule ^Framework/     index.php [QSA,L]
 RewriteRule ^Templates/     index.php [QSA,L]
 

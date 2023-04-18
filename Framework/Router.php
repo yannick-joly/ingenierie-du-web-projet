@@ -9,6 +9,7 @@ class Router extends AbstractComponent
 {
     protected string $routeParamName;
     protected array $routes;
+    protected Route $defaultRoute;
     protected string $file;
 
     public function __construct(AbstractApplication $app)
@@ -27,10 +28,17 @@ class Router extends AbstractComponent
         string $method = 'GET',
         array $additional = [],
         array $optional = []
-    ): Route {
+    ): Route
+    {
         $route = new Route($url, $controller, $action, $method, $additional, $optional);
         $this->routes[] = $route;
         return $route;
+    }
+
+    public function mapDefault(string $controller, string $action = 'index'): Route
+    {
+        $this->defaultRoute = new Route('', $controller, $action);
+        return $this->defaultRoute;
     }
 
     /**
@@ -45,10 +53,11 @@ class Router extends AbstractComponent
         if (is_null($url)) {
             $url = $this->getUrl();
         }
+        $method = $_SERVER['REQUEST_METHOD'];
 
         //check for a predefined route
         foreach ($this->routes as $route) {
-            $parameters = $this->matchRoute($url, $route);
+            $parameters = $this->matchRoute($method, $url, $route);
             if (!is_null($parameters)) {
                 $foundRoute = $route;
                 $foundRoute->requestParams = $parameters;
@@ -65,6 +74,10 @@ class Router extends AbstractComponent
                     $foundRoute->requestParams['get'][$key] = $getParam;
                 }
             }
+        }
+
+        if (empty($foundRoute) && empty($this->defaultRoute) === false) {
+            $foundRoute = $this->defaultRoute;
         }
 
         //return found route and parameters
@@ -85,8 +98,12 @@ class Router extends AbstractComponent
         return $url;
     }
 
-    public function matchRoute(string $url, Route $route): ?array
+    public function matchRoute(string $method, string $url, Route $route): ?array
     {
+        if ($method != $route->method) {
+            return null;
+        }
+
         $requiredParams = [];
 
         //handle parameter types

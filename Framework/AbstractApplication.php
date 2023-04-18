@@ -14,6 +14,7 @@ abstract class AbstractApplication
     protected View $view;
     protected array $managers = [];
     protected string $routeParamName;
+    protected Router $router;
 
     public function __construct()
     {
@@ -70,6 +71,11 @@ abstract class AbstractApplication
     public function routeParamName(): string
     {
         return $this->routeParamName;
+    }
+
+    public function getRouter()
+    {
+        return $this->router;
     }
 
     /**

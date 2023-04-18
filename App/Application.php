@@ -11,25 +11,21 @@ class Application extends AbstractApplication
     public function run()
     {
         // default response if no route found
-        $controllerName = DefaultController::class;
-        $actionName = '404';
         $requestParams = [];
 
         // map all routes to corresponding controllers/actions
-        $router = new Router($this);
-        $router->map('/', DefaultController::class, 'index', 'GET');
-        $router->map('/test/:int|nombre:', DefaultController::class, 'test', 'GET');
+        $this->router = new Router($this);
+        $this->router->mapDefault(DefaultController::class, '404');
 
-        $route = $router->findRoute();
+        $this->router->map('/', DefaultController::class, 'index', 'GET');
+        $this->router->map('/test/:int|nombre:', DefaultController::class, 'test', 'GET');
 
-        // route trouvée
-        if (is_object($route)) {
-            $controllerName = $route->controller;
-            $actionName = $route->action;
-            $requestParams = $route->requestParams;
+        $route = $this->router->findRoute();
+
+        if (empty($route)) {
+            throw new RuntimeException('no available route found for this URL');
         }
-
-        $controller = $router->getController($controllerName);
-        $controller->execute($actionName, $requestParams);
+        $controller = $this->router->getController($route->controller);
+        $controller->execute($route->action, $route->requestParams);
     }
 }
