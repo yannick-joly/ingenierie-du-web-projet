@@ -118,7 +118,6 @@ class JwtUtils
 
         $signature_computed = self::buildSignature(self::base64url_encode($header_json), self::base64url_encode($payload_json));
 
-        // var_dump($header, $payload, $signature_provided, $signature_computed);
         if ($signature_provided === $signature_computed) {
             $expiration = DateTime::createFromFormat('U', $payload->exp);
 
@@ -127,8 +126,6 @@ class JwtUtils
             
             return self::STATUS_EXPIRED;
         }
-
-        var_dump($signature_provided, $signature_computed, $expiration);
 
         return self::STATUS_INVALID;
     }
