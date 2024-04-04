@@ -22,22 +22,22 @@ class Router extends AbstractComponent
     }
 
     public function map(
+        string $method,
         string $url,
         string $controller,
         string $action = 'index',
-        string $method = 'GET',
         array $additional = [],
         array $optional = []
     ): Route
     {
-        $route = new Route($url, $controller, $action, $method, $additional, $optional);
+        $route = new Route($method, $url, $controller, $action, $additional, $optional);
         $this->routes[] = $route;
         return $route;
     }
 
     public function mapDefault(string $controller, string $action = 'index'): Route
     {
-        $this->defaultRoute = new Route('', $controller, $action);
+        $this->defaultRoute = new Route('', '', $controller, $action);
         return $this->defaultRoute;
     }
 
@@ -78,6 +78,8 @@ class Router extends AbstractComponent
 
         if (empty($foundRoute) && empty($this->defaultRoute) === false) {
             $foundRoute = $this->defaultRoute;
+        } else {
+            throw new \RuntimeException('no available route found for this URL');
         }
 
         //return found route and parameters
@@ -108,7 +110,7 @@ class Router extends AbstractComponent
 
         //handle parameter types
         $regexp = preg_replace_callback(
-            "/:(\w+)\|(\w+):/",
+            "/{(\w+)\:(\w+)}/",
             function ($matches) use (&$requiredParams) {
 
                 $requiredParams[] = $matches[2];

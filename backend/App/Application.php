@@ -15,16 +15,13 @@ class Application extends AbstractApplication
 
         // map all routes to corresponding controllers/actions
         $this->router = new Router($this);
-        $this->router->mapDefault(DefaultController::class, '404');
+        $this->router->mapDefault(DefaultController::class, 'error404');
 
-        $this->router->map('/', DefaultController::class, 'index', 'GET');
-        $this->router->map('/test/:int|nombre:', DefaultController::class, 'test', 'GET');
+        $this->router->map('GET', '/', DefaultController::class, 'index');
+        $this->router->map('GET', '/test/{int:nombre}', DefaultController::class, 'test');
 
         $route = $this->router->findRoute();
 
-        if (empty($route)) {
-            throw new RuntimeException('no available route found for this URL');
-        }
         $controller = $this->router->getController($route->controller);
         $controller->execute($route->action, $route->requestParams);
     }

@@ -12,13 +12,12 @@ class Route
     public array $additionalParams;
     public array $optionalParams;
 
-    public function __construct(string $url, string $controller, string $action = 'index',
-                                string $method = 'GET')
+    public function __construct(string $method, string $url, string $controller, string $action = 'index')
     {
+        $this->method = $method;
         $this->url = $url;
         $this->controller = $controller;
         $this->action = $action;
-        $this->method = $method;
         $this->requestParams = [];
         $this->additionalParams = [];
         $this->optionalParams = [];
