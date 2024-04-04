@@ -4,15 +4,6 @@ namespace CPE\Framework;
 
 use LogicException;
 
-define('RESPONSE_CSV', 'csv');
-define('RESPONSE_RSS', 'rss');
-define('RESPONSE_ATOM', 'atom');
-define('RESPONSE_FILE', 'file');
-define('RESPONSE_HTML', 'html');
-define('RESPONSE_IMG_JPEG', 'jpeg');
-define('RESPONSE_JSON', 'json');
-define('RESPONSE_MAIL', 'mail');
-
 /**
  * View handler
  * Class that manages the output of the application
@@ -35,13 +26,13 @@ class View extends AbstractComponent
         $this->ApacheURLRewriting = $ApacheURLRewriting;
         $this->rootUrl = $this->getProtocol() . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-        $this->templatePath = 'Templates' . DIRECTORY_SEPARATOR;
+        $this->templatePath = 'App/Templates' . DIRECTORY_SEPARATOR;
 
         //if there is no URL Rewriting, the route will be put in the $_GET['p']
         $this->baseUrl = $this->rootUrl ?: dirname($_SERVER['PHP_SELF']) . '/';
         $this->baseUrl .= !$this->ApacheURLRewriting ? '?' . $this->app->routeParamName() . '=' : '';
 
-        $this->setParam("templateUrl", $this->rootUrl . 'Templates/');
+        $this->setParam("templateUrl", $this->rootUrl . 'App/Templates/');
         $this->setParam("rootUrl", $this->rootUrl);
         $this->setParam("baseUrl", $this->baseUrl);
     }
