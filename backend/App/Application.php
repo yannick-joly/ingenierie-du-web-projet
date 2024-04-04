@@ -10,9 +10,6 @@ class Application extends AbstractApplication
 {
     public function run()
     {
-        // default response if no route found
-        $requestParams = [];
-
         // map all routes to corresponding controllers/actions
         $this->router = new Router($this);
         $this->router->mapDefault(DefaultController::class, 'error404');
@@ -21,8 +18,7 @@ class Application extends AbstractApplication
         $this->router->map('GET', '/test/{int:nombre}', DefaultController::class, 'test');
 
         $route = $this->router->findRoute();
-
         $controller = $this->router->getController($route->controller);
-        $controller->execute($route->action, $route->requestParams);
+        $controller->execute($route->action, $route->foundParams);
     }
 }

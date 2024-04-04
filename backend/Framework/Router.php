@@ -60,7 +60,7 @@ class Router extends AbstractComponent
             $parameters = $this->matchRoute($method, $url, $route);
             if (!is_null($parameters)) {
                 $foundRoute = $route;
-                $foundRoute->requestParams = $parameters;
+                $foundRoute->foundParams = $parameters;
             }
         }
 
@@ -68,17 +68,13 @@ class Router extends AbstractComponent
         $get = $_GET;
         unset($get[$this->routeParamName]);
         if (empty($get) === false) {
-            $foundRoute->requestParams['get'] = [];
-            foreach ($_GET as $key => $getParam) {
-                if ($key != $this->routeParamName) {
-                    $foundRoute->requestParams['get'][$key] = $getParam;
-                }
-            }
+            $foundRoute->foundParams['get'] = $get;
         }
 
-        if (empty($foundRoute) && empty($this->defaultRoute) === false) {
+        if (empty($foundRoute)) {
             $foundRoute = $this->defaultRoute;
-        } else {
+        }
+        if (empty($foundRoute)) {
             throw new \RuntimeException('no available route found for this URL');
         }
 
@@ -106,29 +102,8 @@ class Router extends AbstractComponent
             return null;
         }
 
-        $requiredParams = [];
-
-        //handle parameter types
-        $regexp = preg_replace_callback(
-            "/{(\w+)\:(\w+)}/",
-            function ($matches) use (&$requiredParams) {
-
-                $requiredParams[] = $matches[2];
-
-                //handle parameter type
-                if ($matches[1] == 'int') {
-                    return '(\d+)';
-                } elseif ($matches[1] == 'string') {
-                    return '(.+)';
-                } else {
-                    return $matches[0];
-                }
-            },
-            str_replace('.', '\.', $route->url)
-        );
-
         //route doesn't match when including required parameters
-        if (preg_match('%^' . $regexp . '(/.*)?$%i', $url, $matches) == false) {
+        if (preg_match('%^' . $route->urlRegexp . '(/.*)?$%i', $url, $matches) == false) {
             return null;
         }
 
@@ -138,12 +113,12 @@ class Router extends AbstractComponent
         //remove unnecessary match
         unset($matches[0]);
         //pop optional parameters if they exists
-        if (count($matches) > count($requiredParams)) {
+        if (count($matches) > count($route->requiredParams)) {
             $optionalParamsGiven = array_pop($matches);
         }
         //combine required parameter values and names
-        if (!empty($requiredParams)) {
-            $parameters = array_combine($requiredParams, $matches);
+        if (!empty($route->requiredParams)) {
+            $parameters = array_combine($route->requiredParams, $matches);
         }
 
         //handle additional parameters (constants given via the route definition)
