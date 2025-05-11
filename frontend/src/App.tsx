@@ -13,6 +13,7 @@ function App() {
       </div>
 
       <div className="center">
+        {/* Remplacé Next/Image par une img standard */}
         <img
           className="logo"
           src={croiseur}
