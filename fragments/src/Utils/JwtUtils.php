@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Utils;
+namespace App\Utils;
 
 use DateTime;
 use DateInterval;
@@ -19,7 +19,7 @@ class JwtUtils
     /**
      * See documentation: https://www.rfc-editor.org/rfc/rfc7519
      * @param array $data information added to JWT payload
-     * 
+     *
      * @return array
      */
     public static function newAccessToken(array $data = []): array
@@ -102,7 +102,7 @@ class JwtUtils
     /**
      * Control a given JWT for validity and expiration
      * @param string $jwt
-     * 
+     *
      * @return int one of the ::STATUS_XXX constants
      */
     public static function checkAccessToken(string $access_token): int
@@ -110,7 +110,7 @@ class JwtUtils
         $parts = explode('.', $access_token);
         if (count($parts) != 3)
             return self::STATUS_INVALID;
-        
+
         $header_json = self::base64url_decode($parts[0]);
         $payload_json = self::base64url_decode($parts[1]);
         $payload = json_decode($payload_json);
@@ -123,7 +123,7 @@ class JwtUtils
 
             if ($expiration > new DateTime())
                 return self::STATUS_VALID;
-            
+
             return self::STATUS_EXPIRED;
         }
 
@@ -133,7 +133,7 @@ class JwtUtils
     /**
      * Get payload data from JWT as object
      * @param string $jwt
-     * 
+     *
      * @return object
      */
     public static function getPayload(string $jwt): object
