@@ -7,7 +7,7 @@ Commencez par créer un projet et installer ses dépendances (en gros : le frame
 
 ```bash
 composer create-project yosko/watamelo-skeleton backend \
-  --repository='{"type": "git", "url": "git@github.com:yosko/watamelo-skeleton"}'
+  --repository='{"type": "vcs", "url": "git@github.com:yosko/watamelo-skeleton"}'
 ```
 
 _NB : vous pouvez remplacer "backend" par le nom de projet back de votre choix, en **snake-case**. Cela changera le nom de sous-dossier, mais aussi dans le code le **namespace** de base._
