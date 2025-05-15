@@ -6,7 +6,7 @@
 Commencez par créer un projet et installer ses dépendances (en gros : le framework + un exemple d'utilisation) :
 
 ```bash
-composer create-project yosko/watamelo-skeleton backend \
+docker compose exec php composer create-project yosko/watamelo-skeleton backend \
   --repository='{"type": "vcs", "url": "git@github.com:yosko/watamelo-skeleton"}'
 ```
 
