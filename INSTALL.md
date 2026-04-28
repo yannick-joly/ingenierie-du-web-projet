@@ -1,6 +1,6 @@
 # Installation du projet
 
-Vous noterez que certaines commandes sont préfixées par `docker compose exec php` : cela indique explicitement qu'elles doivent être exécutées à l'intérieur du conteneur servant à l'exécution du code PHP.
+Vous noterez que certaines commandes sont préfixées par `docker compose exec phpfpm` : cela indique explicitement qu'elles doivent être exécutées par le conteneur servant à l'exécution du code PHP.
 
 ## Initialiser le backend
 
