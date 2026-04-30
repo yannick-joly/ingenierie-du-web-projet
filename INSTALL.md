@@ -1,39 +1,50 @@
-# Installation du projet
+# Installer et démarrer le projet
 
-Vous noterez que certaines commandes sont préfixées par `docker compose exec phpfpm` : cela indique explicitement qu'elles doivent être exécutées par le conteneur servant à l'exécution du code PHP.
+## Premier démarrage
+Cette action doit être effectuée par **un seul membre de l'équipe**. Une fois terminée, les autres membres de l'équipe pourront simplement faire un `git pull` pour récupérer le projet pleinement initialisé et avec les bons droits.
 
-## Initialiser le backend
-
-Toute cette partie doit être réalisé par **un seul membre de l'équipe** dans l'équipe. Après qu'il/elle ait poussé ces modifications sur le dépôt, les autres peuvent _Charger les dépendances_ (voir plus bas).
-
-### Framework et squelette d'application
-Commencez par créer un projet et installer ses dépendances (en gros : le framework + un exemple d'utilisation) :
+### Sur Linux / WSL
 
 ```bash
-docker compose exec php composer create-project yosko/watamelo-skeleton backend \
-  --repository='{"type": "vcs", "url": "git@github.com:yosko/watamelo-skeleton"}'
+# exporter l'uid de l'utilisateur courant côté hôte (Docker en aura besoin pour les permissions)
+export HOST_UID=$(id -u)
+
+# construire et lancer les conteneurs
+docker compose up -d --build
+
+# installer le squelette d'application et le framework
+# (depuis le conteneur et avec les bons droits utilisateur)
+docker compose exec --user $(id -u):www-data phpfpm composer create-project yosko/watamelo-skeleton . --remove-vcs
+```
+_NB : le chemin `.` fera installer le projet à la racine du dossier `src/` (donc `/var/www/html/` dans le conteneur)._
+
+
+### Commandes équivalente sur Windows
+
+```powershell
+# construire et lancer les conteneurs
+docker compose up -d --build
+
+# installer le squelette d'application et le framework
+docker compose exec phpfpm composer create-project yosko/watamelo-skeleton . --remove-vcs
 ```
 
-_NB : vous pouvez remplacer "backend" par le nom de projet back de votre choix, en **snake-case**. Cela changera le nom de sous-dossier, mais aussi dans le code le **namespace** de base._
 
-Équivalent en Windows Batch (aka `cmd`) / Git Bash :
-```bash
-docker compose exec php composer create-project yosko/watamelo-skeleton backend ^
-  --repository="{\"type\":\"vcs\",\"url\":\"git@github.com:yosko/watamelo-skeleton.git\"}" ^
-```
+## Ajouter le code utile
 
-_Powershell : la syntaxe devrait être encore différente._
+Du code nécessaire au *backend* vous est fourni dans le dossier `fragments/` : déplacez-les vers `src/` en conservant la même arborescence (là aussi, un seul membre de l'équipe doit s'en occuper). Vous devrez fusionner certains dossiers.
 
-
-### Code utile
-Du code nécessaire au *backend* vous est fourni dans le dossier `fragments/` : déplacez-les vers `backend/` en conservant la même sous-arborescence.
 
 ## Charger les dépendances
 
-Si un autre membre de l'équipe a déjà intégré le squelette d'application et le framework, votre `git clone` contiendra déjà presque tout ce qu'il vous faut, excepté les dépendances (le dossier `backend/vendor/`).
+Si un autre membre de l'équipe a déjà intégré le squelette d'application et le framework, votre `git clone` contiendra déjà presque tout ce qu'il vous faut, excepté les dépendances (le dossier `src/vendor/`).
 
-Pour les récupérer, placez-vous dans `backend/`, puis tapez :
+Pour les récupérer, placez-vous dans `src/`, puis tapez :
 
 ```bash
-docker compose exec php composer install
+# Reconstruire les conteneurs
+docker compose up -d --build
+
+# Installer les dépendances
+docker compose exec phpfpm composer install
 ```
