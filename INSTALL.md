@@ -48,3 +48,10 @@ docker compose up -d --build
 # Installer les dépendances
 docker compose exec phpfpm composer install
 ```
+
+## Initialiser la base de données
+Une fois le code passé de `fragments/` vers `src/`, vous pouvez créer (ou re-créer) la base de données au besoin, en se basant sur le script SQL `fragments/data/init.sql` que vous pouvez faire évoluer.
+
+```bash
+docker compose exec --user $(id -u):www-data phpfpm php data/init.php
+```
