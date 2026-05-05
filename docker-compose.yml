@@ -5,7 +5,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./src:/var/www/html
+      - ./code:/var/www/html
     depends_on:
       - phpfpm
     networks:
@@ -15,20 +15,21 @@ services:
     build:
       context: ./conf/phpfpm
     volumes:
-      - ./src:/var/www/html
+      - ./code:/var/www/html
     networks:
       - projet-inge-web
     environment:
       - HOST_UID=${HOST_UID:-1000}
     command: sh -c "chown -R $${HOST_UID}:www-data /var/www/html/ && chmod -R g+w /var/www/html && php-fpm"
+
   # sqlite-web:
   #   container_name: sqlite-web-client
   #   image: coleifer/sqlite-web
   #   restart: on-failure
   #   ports:
-  #     - 50181:8080
+  #     - 8081:8080
   #   volumes:
-  #     - ./src/data:/data:ro
+  #     - ./code/data:/data:ro
   #   command: sqlite_web --host 0.0.0.0 --port 8080 /data/battleship.db
   #   networks:
   #     - projet-inge-web
